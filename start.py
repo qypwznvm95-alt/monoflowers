@@ -2,7 +2,6 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes
 from config import LINKS
 
-# Создаем клавиатуру с кнопками
 def create_main_keyboard():
     keyboard = [
         [
@@ -24,7 +23,6 @@ def create_main_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-# Приветственное сообщение
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = """
 🌸 *Добро пожаловать в monoflowers!* 🌸
@@ -55,7 +53,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode='Markdown'
         )
 
-# Обработчик нажатий на кнопки
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -63,14 +60,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     callback_data = query.data
     
     if callback_data == "place_order_here":
-        # Здесь будет переход к боту для заказов
-        order_text = """
-🎉 *Отлично! Вы выбрали оформление заказа здесь!*
-
-Сейчас я помогу вам собрать идеальный букет. 
-
-*Что бы вы хотели заказать?*
-        """
+        order_text = "🎉 *Отлично! Вы выбрали оформление заказа здесь!*\n\nСейчас я помогу вам собрать идеальный букет.\n\n*Что бы вы хотели заказать?*"
         
         order_keyboard = [
             [InlineKeyboardButton("💐 Собрать букет", callback_data="build_bouquet")],
@@ -90,30 +80,36 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 Вы можете написать нам напрямую:
 • Телефон: +7 918 899-90-06
-• WA: wa.me/79188999006
+• WhatsApp: wa.me/79188999006
 • Telegram: @rose_azov
 
 Мы ответим в ближайшее время! ⏰
         """
+        
+        contact_keyboard = [
+            [
+                InlineKeyboardButton("📞 Позвонить", url="tel:+79188999006"),
+                InlineKeyboardButton("💬 WhatsApp", url="https://wa.me/79188999006")
+            ],
+            [
+                InlineKeyboardButton("✈️ Telegram", url="https://t.me/rose_azov"),
+                InlineKeyboardButton("📧 Email", url="mailto:info@monoflowers.ru")
+            ],
+            [InlineKeyboardButton("🔙 Назад", callback_data="back_to_main")]
+        ]
+        
         await query.edit_message_text(
             contact_text,
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Назад", callback_data="back_to_main")]]),
+            reply_markup=InlineKeyboardMarkup(contact_keyboard),
             parse_mode='Markdown'
         )
     
     elif callback_data == "back_to_main":
-        # Возврат к главному меню
         await start(update, context)
     
     elif callback_data in ["build_bouquet", "ready_bouquets"]:
-        # Заглушка для будущей функциональности заказов
         await query.edit_message_text(
-            "🚀 *Эта функция скоро будет доступна!*\n\n"
-            "Наш умный бот-помощник для заказов находится в разработке. "
-            "А пока вы можете:\n\n"
-            "• Перейти в наш Telegram-магазин\n"
-            "• Посмотреть каталог на сайте\n"
-            "• Связаться с менеджером",
+            "🚀 *Эта функция скоро будет доступна!*\n\nА пока вы можете:\n• Перейти в наш Telegram-магазин\n• Посмотреть каталог на сайте\n• Связаться с менеджером",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔙 Назад", callback_data="place_order_here")],
                 [InlineKeyboardButton("🏠 Главное меню", callback_data="back_to_main")]
