@@ -2,6 +2,12 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes
 from config import LINKS
 
+def create_start_keyboard():
+    keyboard = [
+        [InlineKeyboardButton("🚀 START", callback_data="start_main")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
 def create_main_keyboard():
     keyboard = [
         [
@@ -21,7 +27,38 @@ def create_main_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    welcome_text = """
+    # Отправляем видео/гиф с кнопкой START
+    try:
+        # Для видео (раскомментируйте нужную строку)
+        await update.message.reply_video(
+            video=open('welcome_video.mp4', 'rb'),
+            caption="🎬 Добро пожаловать в MONOFLOWERS!",
+            reply_markup=create_start_keyboard()
+        )
+        
+        # Или для гиф (используйте только один вариант)
+        # await update.message.reply_animation(
+        #     animation=open('welcome_gif.gif', 'rb'),
+        #     caption="🎬 Добро пожаловать в MONOFLOWERS!",
+        #     reply_markup=create_start_keyboard()
+        # )
+        
+    except FileNotFoundError:
+        # Если файл не найден, отправляем текст с кнопкой
+        await update.message.reply_text(
+            "🎬 Добро пожаловать в MONOFLOWERS!",
+            reply_markup=create_start_keyboard()
+        )
+
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    callback_data = query.data
+    
+    if callback_data == "start_main":
+        # Главное меню после нажатия START
+        welcome_text = """
 <b>MONOFLOWERS</b>
 
 Группа проектов monoflowers / roseazov / roserostov / dorogobogato / 
@@ -31,22 +68,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 <b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
 
 Выберите, что вас интересует:
-    """
+        """
+        
+        await query.edit_message_caption(caption=welcome_text, reply_markup=create_main_keyboard(), parse_mode='HTML')
     
-    keyboard = create_main_keyboard()
-    
-    if update.message:
-        await update.message.reply_text(welcome_text, reply_markup=keyboard, parse_mode='HTML')
-    else:
-        await update.callback_query.message.reply_text(welcome_text, reply_markup=keyboard, parse_mode='HTML')
-
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    
-    callback_data = query.data
-    
-    if callback_data == "place_order_here":
+    elif callback_data == "place_order_here":
         order_text = "🎉 *Отлично! Вы выбрали оформление заказа здесь!*\n\nСейчас я помогу вам собрать идеальный букет.\n\n*Что бы вы хотели заказать?*"
         
         order_keyboard = [
@@ -92,7 +118,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     
     elif callback_data == "back_to_main":
-        await start(update, context)
+        welcome_text = """
+<b>MONOFLOWERS</b>
+
+Группа проектов monoflowers / roseazov / roserostov / dorogobogato / 
+сервис номер один по доставке цветов
+расширяем географию / возможности / качество / ваш выбор
+
+<b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
+
+Выберите, что вас интересует:
+        """
+        await query.edit_message_text(welcome_text, reply_markup=create_main_keyboard(), parse_mode='HTML')
     
     elif callback_data in ["build_bouquet", "ready_bouquets"]:
         await query.edit_message_text(
