@@ -27,27 +27,21 @@ def create_main_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Отправляем видео/гиф с кнопкой START
+    # Отправляем GIF с автовоспроизведением и кнопкой START
     try:
-        # Для видео (раскомментируйте нужную строку)
-        await update.message.reply_video(
-            video=open('welcome_video.mp4', 'rb'),
-            caption="🎬 Добро пожаловать в MONOFLOWERS!",
-            reply_markup=create_start_keyboard()
+        await update.message.reply_animation(
+            animation=open('welcome.gif', 'rb'),
+            caption="🎬 <b>MONOFLOWERS</b>\n\nНажмите START чтобы продолжить",
+            reply_markup=create_start_keyboard(),
+            parse_mode='HTML'
         )
-        
-        # Или для гиф (используйте только один вариант)
-        # await update.message.reply_animation(
-        #     animation=open('welcome_gif.gif', 'rb'),
-        #     caption="🎬 Добро пожаловать в MONOFLOWERS!",
-        #     reply_markup=create_start_keyboard()
-        # )
         
     except FileNotFoundError:
         # Если файл не найден, отправляем текст с кнопкой
         await update.message.reply_text(
-            "🎬 Добро пожаловать в MONOFLOWERS!",
-            reply_markup=create_start_keyboard()
+            "🎬 <b>MONOFLOWERS</b>\n\nНажмите START чтобы продолжить",
+            reply_markup=create_start_keyboard(),
+            parse_mode='HTML'
         )
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,7 +64,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 Выберите, что вас интересует:
         """
         
-        await query.edit_message_caption(caption=welcome_text, reply_markup=create_main_keyboard(), parse_mode='HTML')
+        # Удаляем предыдущее сообщение с GIF и отправляем новое
+        await query.message.delete()
+        await query.message.chat.send_message(
+            welcome_text,
+            reply_markup=create_main_keyboard(),
+            parse_mode='HTML'
+        )
     
     elif callback_data == "place_order_here":
         order_text = "🎉 *Отлично! Вы выбрали оформление заказа здесь!*\n\nСейчас я помогу вам собрать идеальный букет.\n\n*Что бы вы хотели заказать?*"
@@ -119,13 +119,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif callback_data == "back_to_main":
         welcome_text = """
-<b>MONOFLOWERS</b>
+<b>M O N O F L O W E R S</b>
 
 Группа проектов monoflowers / roseazov / roserostov / dorogobogato / 
 сервис номер один по доставке цветов
 расширяем географию / возможности / качество / ваш выбор
 
-<b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
+<b>Д Е Л А Т Ь  О х К А К  -  Н А Ш  П Р О Ф И Л Ь</b>
 
 Выберите, что вас интересует:
         """
