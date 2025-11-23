@@ -9,9 +9,6 @@ def create_main_keyboard():
             InlineKeyboardButton("🌐 Ростов-на-Дону (РО)", url=LINKS['rnd_website'])
         ],
         [
-            InlineKeyboardButton("🤖 Оформить заказ в Telegram", url=LINKS['telegram_shop'])
-        ],
-        [
             InlineKeyboardButton("📱 Скачать приложение (iOS)", url=LINKS['mobile_app'])
         ],
         [
@@ -25,33 +22,23 @@ def create_main_keyboard():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_text = """
-🌸 *Добро пожаловать в monoflowers!* 🌸
+<b>MONOFLOWERS</b>
 
-Мы создаём прекрасные букеты с доставкой в Азове и Ростове-на-Дону.
+Группа проектов monoflowers / roseazov / roserostov / dorogobogato / 
+сервис номер один по доставке цветов
+расширяем географию / возможности / качество / ваш выбор
+
+<b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
 
 Выберите, что вас интересует:
-• 🌐 *Сайты магазинов* - посмотрите наши работы и акции
-• 🤖 *Оформить заказ* - умный помощник соберёт идеальный букет
-• 📱 *Мобильное приложение* - заказывайте еще удобнее
-• 🛍️ *Оформить заказ здесь* - начните оформление в этом чате
-
-*Доставка цветов — это наша страсть!* 💐
     """
     
     keyboard = create_main_keyboard()
     
     if update.message:
-        await update.message.reply_text(
-            welcome_text, 
-            reply_markup=keyboard,
-            parse_mode='Markdown'
-        )
+        await update.message.reply_text(welcome_text, reply_markup=keyboard, parse_mode='HTML')
     else:
-        await update.callback_query.message.reply_text(
-            welcome_text,
-            reply_markup=keyboard,
-            parse_mode='Markdown'
-        )
+        await update.callback_query.message.reply_text(welcome_text, reply_markup=keyboard, parse_mode='HTML')
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -79,8 +66,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 📞 *Связь с менеджером*
 
 Вы можете написать нам напрямую:
-• Телефон: +7 918 899-90-06
-• WhatsApp: wa.me/79188999006
+• Телефон: 8 918 899 90 04
+• WhatsApp: wa.me/79188999004
 • Telegram: @rose_azov
 
 Мы ответим в ближайшее время! ⏰
@@ -88,8 +75,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         contact_keyboard = [
             [
-                InlineKeyboardButton("📞 Позвонить", url="tel:+79188999006"),
-                InlineKeyboardButton("💬 WhatsApp", url="https://wa.me/79188999006")
+                InlineKeyboardButton("📞 Позвонить", url="tel:+79188999004"),
+                InlineKeyboardButton("💬 WhatsApp", url="https://wa.me/79188999004")
             ],
             [
                 InlineKeyboardButton("✈️ Telegram", url="https://t.me/rose_azov"),
