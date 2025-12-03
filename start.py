@@ -4,7 +4,7 @@ from config import LINKS
 
 def create_start_keyboard():
     keyboard = [
-        [InlineKeyboardButton("🚀 START", callback_data="start_main")]
+        [InlineKeyboardButton("🔴 ▶️ PLAY", callback_data="start_main")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -27,22 +27,31 @@ def create_main_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Отправляем GIF с автовоспроизведением и кнопкой START
+    # Отправляем видео/гиф с красной кнопкой PLAY
     try:
-        await update.message.reply_animation(
-            animation=open('welcome.gif', 'rb'),
-            caption="🎬 <b>MONOFLOWERS</b>\n\nНажмите START чтобы продолжить",
+        # Пробуем отправить видео
+        await update.message.reply_video(
+            video=open('welcome_video.mp4', 'rb'),
+            caption="💐 <b>MONOFLOWERS</b>\n\n⬇️ <b>НАЖМИ НА ВИДЕО ЧТОБЫ ЗАПУСТИТЬ</b> ⬇️",
             reply_markup=create_start_keyboard(),
             parse_mode='HTML'
         )
-        
     except FileNotFoundError:
-        # Если файл не найден, отправляем текст с кнопкой
-        await update.message.reply_text(
-            "🎬 <b>MONOFLOWERS</b>\n\nНажмите START чтобы продолжить",
-            reply_markup=create_start_keyboard(),
-            parse_mode='HTML'
-        )
+        # Если видео нет, пробуем гиф
+        try:
+            await update.message.reply_animation(
+                animation=open('welcome.gif', 'rb'),
+                caption="💐 <b>MONOFLOWERS</b>\n\n⬇️ <b>GIF автозапуск</b> ⬇️",
+                reply_markup=create_start_keyboard(),
+                parse_mode='HTML'
+            )
+        except FileNotFoundError:
+            # Если нет ни видео ни гиф
+            await update.message.reply_text(
+                "💐 <b>MONOFLOWERS</b>\n\nНажмите PLAY чтобы начать",
+                reply_markup=create_start_keyboard(),
+                parse_mode='HTML'
+            )
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -51,7 +60,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     callback_data = query.data
     
     if callback_data == "start_main":
-        # Главное меню после нажатия START
+        # Главное меню после нажатия PLAY
         welcome_text = """
 <b>MONOFLOWERS</b>
 
@@ -59,12 +68,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 сервис номер один по доставке цветов
 расширяем географию / возможности / качество / ваш выбор
 
-<b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
+<b>ДЕЛАТЬ ШИКАРНО - НАШ ПРОФИЛЬ</b>
 
 Выберите, что вас интересует:
         """
         
-        # Удаляем предыдущее сообщение с GIF и отправляем новое
+        # Удаляем предыдущее сообщение с медиа и отправляем новое
         await query.message.delete()
         await query.message.chat.send_message(
             welcome_text,
@@ -72,24 +81,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode='HTML'
         )
     
-    elif callback_data == "place_order_here":
-        order_text = "🎉 *Отлично! Вы выбрали оформление заказа здесь!*\n\nСейчас я помогу вам собрать идеальный букет.\n\n*Что бы вы хотели заказать?*"
-        
-        order_keyboard = [
-            [InlineKeyboardButton("💐 Собрать букет", callback_data="build_bouquet")],
-            [InlineKeyboardButton("🌹 Готовые букеты", callback_data="ready_bouquets")],
-            [InlineKeyboardButton("🔙 Назад", callback_data="back_to_main")]
-        ]
-        
-        await query.edit_message_text(
-            order_text,
-            reply_markup=InlineKeyboardMarkup(order_keyboard),
-            parse_mode='Markdown'
-        )
-    
     elif callback_data == "contact_manager":
+        # Обработка кнопки "Связаться с менеджером"
         contact_text = """
-📞 *Связь с менеджером*
+<b>📞 Связь с менеджером</b>
 
 Вы можете написать нам напрямую:
 • Телефон: 8 918 899 90 04
@@ -114,29 +109,48 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(
             contact_text,
             reply_markup=InlineKeyboardMarkup(contact_keyboard),
-            parse_mode='Markdown'
+            parse_mode='HTML'
+        )
+    
+    elif callback_data == "place_order_here":
+        order_text = "🎉 <b>Отлично! Вы выбрали оформление заказа здесь!</b>\n\nСейчас я помогу вам собрать идеальный букет.\n\n<b>Что бы вы хотели заказать?</b>"
+        
+        order_keyboard = [
+            [InlineKeyboardButton("💐 Собрать букет", callback_data="build_bouquet")],
+            [InlineKeyboardButton("🌹 Готовые букеты", callback_data="ready_bouquets")],
+            [InlineKeyboardButton("🔙 Назад", callback_data="back_to_main")]
+        ]
+        
+        await query.edit_message_text(
+            order_text,
+            reply_markup=InlineKeyboardMarkup(order_keyboard),
+            parse_mode='HTML'
         )
     
     elif callback_data == "back_to_main":
         welcome_text = """
-<b>M O N O F L O W E R S</b>
+<b>MONOFLOWERS</b>
 
 Группа проектов monoflowers / roseazov / roserostov / dorogobogato / 
 сервис номер один по доставке цветов
 расширяем географию / возможности / качество / ваш выбор
 
-<b>Д Е Л А Т Ь  О х К А К  -  Н А Ш  П Р О Ф И Л Ь</b>
+<b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
 
 Выберите, что вас интересует:
         """
-        await query.edit_message_text(welcome_text, reply_markup=create_main_keyboard(), parse_mode='HTML')
+        await query.edit_message_text(
+            welcome_text,
+            reply_markup=create_main_keyboard(),
+            parse_mode='HTML'
+        )
     
     elif callback_data in ["build_bouquet", "ready_bouquets"]:
         await query.edit_message_text(
-            "🚀 *Эта функция скоро будет доступна!*\n\nА пока вы можете:\n• Перейти в наш Telegram-магазин\n• Посмотреть каталог на сайте\n• Связаться с менеджером",
+            "🚀 <b>Эта функция скоро будет доступна!</b>\n\nА пока вы можете:\n• Перейти в наш Telegram-магазин\n• Посмотреть каталог на сайте\n• Связаться с менеджером",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔙 Назад", callback_data="place_order_here")],
                 [InlineKeyboardButton("🏠 Главное меню", callback_data="back_to_main")]
             ]),
-            parse_mode='Markdown'
+            parse_mode='HTML'
         )
