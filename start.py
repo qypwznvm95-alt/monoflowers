@@ -32,7 +32,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Пробуем отправить видео
         await update.message.reply_video(
             video=open('welcome_video.mp4', 'rb'),
-            caption="💐 <b>MONOFLOWERS</b>\n\n⬇️ <b>НАЖМИ НА ВИДЕО ЧТОБЫ ЗАПУСТИТЬ</b> ⬇️",
+            caption="💐 <b>MONOFLOWERS</b>\n\n⬇️ <b>НАЖМИ PLAY ЧТОБЫ ПЕРЕЙТИ В МЕНЮ</b> ⬇️",
             reply_markup=create_start_keyboard(),
             parse_mode='HTML'
         )
