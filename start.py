@@ -96,7 +96,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         contact_keyboard = [
             [
-                InlineKeyboardButton("📞 Позвонить", url="tel:+79188999004"),
+                # ИСПРАВЛЕНО: убрал tel:, добавил callback_data
+                InlineKeyboardButton("📞 Показать номер", callback_data="show_phone_number"),
                 InlineKeyboardButton("💬 WhatsApp", url="https://wa.me/79188999004")
             ],
             [
@@ -106,11 +107,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Назад", callback_data="back_to_main")]
         ]
         
-        await query.edit_message_text(
+        # Удаляем предыдущее сообщение и отправляем новое
+        await query.message.delete()
+        await query.message.chat.send_message(
             contact_text,
             reply_markup=InlineKeyboardMarkup(contact_keyboard),
             parse_mode='HTML'
         )
+    
+    elif callback_data == "show_phone_number":
+        # Показываем номер всплывающим окном
+        await query.answer("📞 Телефон: 8 918 899 90 04\nСкопируйте номер для звонка", show_alert=True)
     
     elif callback_data == "place_order_here":
         order_text = "🎉 <b>Отлично! Вы выбрали оформление заказа здесь!</b>\n\nСейчас я помогу вам собрать идеальный букет.\n\n<b>Что бы вы хотели заказать?</b>"
@@ -121,7 +128,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔙 Назад", callback_data="back_to_main")]
         ]
         
-        await query.edit_message_text(
+        # Удаляем предыдущее сообщение и отправляем новое
+        await query.message.delete()
+        await query.message.chat.send_message(
             order_text,
             reply_markup=InlineKeyboardMarkup(order_keyboard),
             parse_mode='HTML'
@@ -135,22 +144,31 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 сервис номер один по доставке цветов
 расширяем географию / возможности / качество / ваш выбор
 
-<b>ДЕЛАТЬ ОЧКАК - НАШ ПРОФИЛЬ</b>
+<b>ДЕЛАТЬ ШИКАРНО - НАШ ПРОФИЛЬ</b>
 
 Выберите, что вас интересует:
         """
-        await query.edit_message_text(
+        
+        # Удаляем предыдущее сообщение и отправляем новое
+        await query.message.delete()
+        await query.message.chat.send_message(
             welcome_text,
             reply_markup=create_main_keyboard(),
             parse_mode='HTML'
         )
     
     elif callback_data in ["build_bouquet", "ready_bouquets"]:
-        await query.edit_message_text(
-            "🚀 <b>Эта функция скоро будет доступна!</b>\n\nА пока вы можете:\n• Перейти в наш Telegram-магазин\n• Посмотреть каталог на сайте\n• Связаться с менеджером",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔙 Назад", callback_data="place_order_here")],
-                [InlineKeyboardButton("🏠 Главное меню", callback_data="back_to_main")]
-            ]),
+        feature_text = "🚀 <b>Эта функция скоро будет доступна!</b>\n\nА пока вы можете:\n• Перейти в наш Telegram-магазин\n• Посмотреть каталог на сайте\n• Связаться с менеджером"
+        
+        feature_keyboard = [
+            [InlineKeyboardButton("🔙 Назад", callback_data="place_order_here")],
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="back_to_main")]
+        ]
+        
+        # Удаляем предыдущее сообщение и отправляем новое
+        await query.message.delete()
+        await query.message.chat.send_message(
+            feature_text,
+            reply_markup=InlineKeyboardMarkup(feature_keyboard),
             parse_mode='HTML'
         )
